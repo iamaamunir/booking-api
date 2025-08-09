@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "./src",
+    "target": "ES2022",
+    "module": "ES2022",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "emitDecoratorMetadata": true,
+    "declaration": true, 
+    "sourceMap": true
+  },
+  "include": ["src/**/*", "server/ts", "src/server.ts"],
+  "exclude": ["node_modules", "dist"]
+}
