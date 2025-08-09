@@ -1,19 +1,32 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
+
+import { Property } from "./property.ts";
 
 @Entity()
-export class Property {
+export class Booking {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ nullable: false, type: "varchar" })
-  title!: string;
+  @Column({ type: "varchar", length: 255 })
+  user_name: string;
 
-  @Column({ nullable: false, type: "varchar" })
-  lastname!: string;
+  @Column({ type: "date" })
+  start_date: string;
 
-  @Column({ nullable: false, type: "varchar" })
-  email!: string;
+  @Column({ type: "date" })
+  end_date: string;
 
-  @Column({ nullable: false, type: "varchar" })
-  password!: string;
+  @CreateDateColumn()
+  created_at!: Date;
+
+  @ManyToOne("Property", "bookings", { onDelete: "CASCADE" })
+  @JoinColumn({ name: "property_id" })
+  property?: Property;
 }

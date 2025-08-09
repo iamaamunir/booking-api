@@ -1,6 +1,14 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+import { Property } from "../entities/property.ts";
+import { Booking } from "../entities/booking.ts";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 dotenv.config();
 
@@ -11,8 +19,8 @@ if (!process.env.DB_URL) {
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DB_URL,
-  entities: [], // Add your entities here later
-  migrations: [], // Add your migrations here later
-  synchronize: process.env.NODE_ENV === "development", // Auto-create tables in dev
-  logging: process.env.NODE_ENV === "development", // Log queries in dev
+entities: [__dirname + "/../entities/*.{ts,js}"],
+  migrations: [__dirname + "src/migrations/*.ts"],
+  synchronize: false,
+  logging: true,
 });

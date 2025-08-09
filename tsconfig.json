@@ -10,8 +10,10 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "emitDecoratorMetadata": true,
-    "declaration": true, 
+    "declaration": true,
     "sourceMap": true
   },
   "include": ["src/**/*", "server/ts", "src/server.ts"],
