@@ -4,9 +4,6 @@ import * as dotenv from "dotenv";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 
-import { Property } from "../entities/property.ts";
-import { Booking } from "../entities/booking.ts";
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -19,8 +16,9 @@ if (!process.env.DB_URL) {
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DB_URL,
-entities: [__dirname + "/../entities/*.{ts,js}"],
-  migrations: [__dirname + "src/migrations/*.ts"],
+  entities: [__dirname + "/../entities/*.{ts,js}"],
+  migrations: [__dirname + "/../migrations/*.{ts,js}"],
+
   synchronize: false,
   logging: true,
 });
