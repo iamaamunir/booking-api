@@ -9,10 +9,7 @@ import cors from "cors";
 import YAML from "yamljs";
 import path from "path";
 import bookingRouter from "./routes/booking.route";
-import { initDataSource } from "./config/data-source-manager";
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
 
 
 const baseDir = path.resolve();
@@ -56,8 +53,5 @@ app.use("/api/v1", bookingRouter);
 
 app.use(errorHandler as ErrorRequestHandler);
 
-(async () => {
-  await initDataSource();
-})();
 
 export default app;
