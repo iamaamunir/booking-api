@@ -86,3 +86,7 @@ src/
     ```sh
     npm run start:dev
     ```
+6. Execute test suites
+   ```sh
+   NODE_ENV=test npm test
+   ```
