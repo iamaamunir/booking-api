@@ -21,6 +21,6 @@ export class Property {
   @Column({ nullable: false, type: "date" })
   available_to!: string;
 
-  @OneToMany("Booking", "property", { cascade: true })
+  @OneToMany("Booking", "property", { onDelete: "CASCADE" })
   bookings?: any[];
 }

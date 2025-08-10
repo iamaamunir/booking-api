@@ -19,7 +19,7 @@ export const AppDataSource = new DataSource({
   url: process.env.DB_URL,
   entities: [path.join(baseDir, "src/entities/*.{ts,js}")],
   migrations: [path.join(baseDir, "src/migrations/*.{ts,js}")],
-  schema: "public",
+  // schema: "public",
   synchronize: false,
   logging: false,
 });
