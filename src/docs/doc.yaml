@@ -1,0 +1,340 @@
+openapi: 3.0.0
+info:
+  title: Asra-Music API Docs
+  description: Asra-Music is a music and video streaming application
+  version: 0.1.9
+servers:
+  - url: '{scheme}://{host}'
+    variables:
+      scheme:
+        default: http
+        enum:
+          - http
+          - https
+      host:
+        default: localhost:5500/api/v1
+        enum:
+          - localhost:5500
+          - backend-web-guhi.onrender.com
+
+paths:
+  /properties:
+    get:
+      summary: Get all properties with pagination
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+          description: Number of properties per page
+      responses:
+        '200':
+          description: Paginated properties list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: All properties successfully fetched
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Property'
+                  meta:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 50
+                      page:
+                        type: integer
+                        example: 1
+                      lastPage:
+                        type: integer
+                        example: 5
+                      limit:
+                        type: integer
+                        example: 10
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /booking:
+    post:
+      summary: Create a new booking
+      description: >
+        Creates a booking for a given property within its availability range.
+        Dates must be in `YYYY-MM-DD` format and within the property's availability.
+        The booking will fail if dates overlap with an existing booking.
+      operationId: createBooking
+      tags:
+        - Booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - property_id
+                - user_name
+                - start_date
+                - end_date
+              properties:
+                property_id:
+                  type: string
+                  format: uuid
+                  description: ID of the property to book
+                  example: "c56a4180-65aa-42ec-a945-5fd21dec0538"
+                user_name:
+                  type: string
+                  description: Name of the user making the booking
+                  example: "John Doe"
+                start_date:
+                  type: string
+                  format: date
+                  description: Start date of the booking (YYYY-MM-DD)
+                  example: "2025-08-20"
+                end_date:
+                  type: string
+                  format: date
+                  description: End date of the booking (YYYY-MM-DD)
+                  example: "2025-08-25"
+      responses:
+        "201":
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+                  user_name:
+                    type: string
+                    example: "John Doe"
+                  start_date:
+                    type: string
+                    format: date
+                    example: "2025-08-20"
+                  end_date:
+                    type: string
+                    format: date
+                    example: "2025-08-25"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2025-08-10T12:34:56Z"
+                  property_id:
+                    type: string
+                    format: uuid
+                    example: "c56a4180-65aa-42ec-a945-5fd21dec0538"
+        "400":
+          description: Validation or business rule failure
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Booking dates must be within property availability range (2025-08-01 to 2025-08-30)"
+                  details:
+                    type: string
+                    example: "start_date must be in the format YYYY-MM-DD"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  /properties/{id}/availability:
+    get:
+      summary: Get available date ranges for a property
+      description: |
+        Retrieves the list of available date ranges for the specified property,
+        based on its booking schedule and availability period.
+      tags:
+        - Properties
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique ID of the property.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved available date ranges.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  property_id:
+                    type: string
+                    example: "12345"
+                  available_ranges:
+                    type: array
+                    description: List of available date ranges for the property.
+                    items:
+                      $ref: "#/components/schemas/DateRange"
+        '404':
+          description: Property not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /bookings/{id}:
+    delete:
+      summary: Cancel a booking
+      description: |
+        Deletes a booking by its ID.  
+        If the booking does not exist, returns a 404 error.  
+        On success, returns HTTP 204 (No Content).
+      tags:
+        - Bookings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique ID of the booking.
+          schema:
+            type: string
+            example: "bkg_001"
+      responses:
+        '204':
+          description: Booking cancelled successfully. No response body.
+        '404':
+          description: Booking not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    Property:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "3448096d-b4a0-454a-9334-c119b6bcdff3"
+        title:
+          type: string
+          example: "Cozy Downtown Studio"
+        description:
+          type: string
+          example: "Compact stylish studio apartment."
+        price_per_night:
+          type: number
+          example: 80
+        available_from:
+          type: string
+          format: date
+          example: "2025-09-01"
+        available_to:
+          type: string
+          format: date
+          example: "2025-12-31"
+    ErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 500
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Internal server error
+    CreateBookingDto:
+      type: object
+      required:
+        - property_id
+        - user_name
+        - start_date
+        - end_date
+      properties:
+        property_id:
+          type: string
+          format: uuid
+        user_name:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    DateRange:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date
+          example: "2025-08-15"
+        end:
+          type: string
+          format: date
+          example: "2025-08-20"
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "bkg_001"
+        property_id:
+          type: string
+          example: "12345"
+        start_date:
+          type: string
+          format: date
+          example: "2025-08-10"
+        end_date:
+          type: string
+          format: date
+          example: "2025-08-12"
+
+    

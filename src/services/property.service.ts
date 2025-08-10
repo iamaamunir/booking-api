@@ -12,12 +12,22 @@ export class PropertyService {
     limit = 10
   ){
     const propertyRepo = AppDataSource.getRepository(Property);
-    const [data, total] = await propertyRepo.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    try {
+      const [data, total] = await propertyRepo.findAndCount({
+        skip: (page - 1) * limit,
+        take: limit,
+      });
 
-    return { data, total, page, limit };
+      return { data, total, page, limit };
+    }
+    catch (error:any) {
+      throw new AppError({
+        message: error.message || "Failed to fetch properties",
+        statusCode: 500,
+        isOperational: false,
+        type: "error",
+      });
+    }
   }
 
   static async getAvailableDateRanges(
