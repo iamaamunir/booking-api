@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,8 +7,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from "typeorm";
-
-import { Property } from "./property.ts";
 
 @Entity()
 export class Booking {
@@ -26,7 +25,10 @@ export class Booking {
   @CreateDateColumn()
   created_at!: Date;
 
+  @Column({ type: "uuid", name: "property_id" })
+  property_id: string;
+
   @ManyToOne("Property", "bookings", { onDelete: "CASCADE" })
   @JoinColumn({ name: "property_id" })
-  property?: Property;
+  property?: any;
 }

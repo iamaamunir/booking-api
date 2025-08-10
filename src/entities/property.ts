@@ -1,11 +1,5 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  Relation,
-} from "typeorm";
-import { Booking } from "./booking.ts";
+import "reflect-metadata";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 
 @Entity()
 export class Property {
@@ -27,8 +21,6 @@ export class Property {
   @Column({ nullable: false, type: "date" })
   available_to!: string;
 
-  @OneToMany("Booking", "property", {
-    onDelete: "CASCADE",
-  })
-  bookings?: Relation<Booking[]>;
+  @OneToMany("Booking", "property", { cascade: true })
+  bookings?: any[];
 }
