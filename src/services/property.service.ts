@@ -7,24 +7,17 @@ type DateRange = { start: string; end: string };
 import { Booking } from "../entities/booking";
 
 export class PropertyService {
-  static async getAllProperty(): Promise<IGetPropertiesDTO[]> {
-    try {
-      const propertyRepo = AppDataSource.getRepository(Property);
-      const properties = await propertyRepo.find();
-      return properties;
-    } catch (error) {
-      console.error("Error fetching properties:", error);
-      if (!(error instanceof AppError)) {
-        console.error("Unexpected error when fetching all plans:", error);
-        throw new AppError({
-          message: "Internal server error",
-          statusCode: 500,
-          isOperational: false,
-          type: "error",
-        });
-      }
-      throw error;
-    }
+  static async getAllProperty(
+    page = 1,
+    limit = 10
+  ){
+    const propertyRepo = AppDataSource.getRepository(Property);
+    const [data, total] = await propertyRepo.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { data, total, page, limit };
   }
 
   static async getAvailableDateRanges(

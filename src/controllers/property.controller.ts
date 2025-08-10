@@ -5,15 +5,26 @@ import { Response, Request, NextFunction } from "express";
 export class propertyController {
   static async getAllProperty(req: Request, res: Response, next: NextFunction) {
     try {
-      const allProperty = await PropertyService.getAllProperty();
-      const response = new ResponseHandler({
-        data: allProperty,
-        message: "All exercise successfully fetched",
-        statusCode: 200,
-        //TODO: PAGINATE THIS IN THE FUTURE WHEN DATA GROWS
-        status: "success",
-      });
-      response.send(res);
+     const page = parseInt(req.query.page as string) || 1;
+     const limit = parseInt(req.query.limit as string) || 10;
+
+     const { data, total } = await PropertyService.getAllProperty(page, limit);
+
+     const meta = {
+       total,
+       page,
+       lastPage: Math.ceil(total / limit),
+       limit,
+     };
+
+     const response = new ResponseHandler({
+       data,
+       message: "All properties successfully fetched",
+       statusCode: 200,
+       status: "success",
+       meta,
+     });
+     response.send(res);
     } catch (error) {
       next(error);
     }
