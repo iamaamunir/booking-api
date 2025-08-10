@@ -3,6 +3,7 @@ import { AppDataSource } from "../config/data-source";
 import { Booking } from "../entities/booking";
 import { Property } from "../entities/property";
 import { CreateBookingDto } from "../dto/create-booking.dto";
+import { AppError } from "../utils/appError";
 
 export class BookingService {
   static async createBooking(
@@ -73,5 +74,16 @@ export class BookingService {
       .add(savedBooking.id);
 
     return savedBooking;
+  }
+
+  static async cancelBooking(bookingId: string): Promise<void> {
+    const bookingRepo = AppDataSource.getRepository(Booking);
+
+    const booking = await bookingRepo.findOne({ where: { id: bookingId } });
+    if (!booking) {
+      throw new AppError({ message: "Booking not found", statusCode: 404 });
+    }
+
+    await bookingRepo.remove(booking);
   }
 }

@@ -1,5 +1,4 @@
-// controllers/booking.controller.ts
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
 import { plainToClass } from "class-transformer";
 import { BookingService } from "../services/booking.service";
@@ -58,6 +57,16 @@ export class BookingController {
 
       // Handle unexpected errors
       res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+  static async cancelBooking(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      await BookingService.cancelBooking(id);
+      res.status(204).send(); // 204 No Content means "deleted successfully"
+    } catch (error) {
+      next(error);
     }
   }
 }
